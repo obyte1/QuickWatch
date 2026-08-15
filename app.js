@@ -2,14 +2,13 @@ const express = require('express');
 const app = express();
 
 const dotenv = require('dotenv');
-
-const productRoute = require('./Routes/ProductRoute');
-const userRoute = require('./Routes/UserRoute');
-
 dotenv.config(); // Load environment variables from .env file
+
 
 app.use(express.json()); //middleware to parse JSON request bodies
 
+const productRoute = require('./Routes/ProductRoute');
+const userRoute = require('./Routes/UserRoute');
 
 
 app.use('/products', productRoute); //use the product route for all requests starting with /products

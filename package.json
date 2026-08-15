@@ -20,6 +20,8 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.8.1",
     "multer": "^2.2.0",
+    "multer-storage-cloudinary": "^4.0.0",
+    "nodemailer": "^9.0.5",
     "nodemon": "^3.1.14"
   }
 }

@@ -1,6 +1,7 @@
 const express = require('express');
 //import authentication middleware
 const { protect } = require('../Middleware/auth');
+const upload = require('../Middleware/upload');
 
 //import authorization middleware
 const { authorize } = require('../Middleware/role');
@@ -11,7 +12,9 @@ const router = express.Router(); //
 const productController = require('../Controllers/ProductController');
 
 //define the routes
-router.post('/createproduct', protect, authorize('supperadmin'), productController.createProduct);
+router.post('/createproduct', protect, productController.createProduct);
+
+router.post('/createproductwithimage', protect, productController.createProductWithImage);
 
 router.put('/updateproduct/:id', protect, authorize('storekeeper'), productController.updateProduct);
 router.get('/getproductbyid/:id', protect, productController.getProductById);

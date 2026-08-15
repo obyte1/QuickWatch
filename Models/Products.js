@@ -29,6 +29,10 @@ const productSchema = new mongose.Schema({
             type: String,
             
 
+    },
+    image: {
+        type: String,
+        required: false
     }
     
 },
