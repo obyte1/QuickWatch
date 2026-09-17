@@ -2,38 +2,43 @@ const mongose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongose.Schema({
-    name: {
+    FirstName: {
         type: String,
         required: true
     },
-    email: {
+    LastName: { 
+        type: String,
+        required: true
+    },
+    Email: {
         type: String,
         required: false,
         unique: true
     },
-    password: {
+    Password: {
         type: String,
         required: true
     },
-    gender: {
+    Gender: {
         type: String,
         required: true
     },
-    HasAdminAccess: {
-        type: Boolean,
-        default: false
-    },
-    phone: {
+    Phone: {
         type: String,
         required: true  
     },
+    zipCode: {
+        type: String,
+        required: true
+    },
+    Address: {
+        type: String,
+        required: true
+    },
     role: {
         type: String,
-        enum: ['superadmin', 'storekeeper', 'salesperson'], // Define the allowed roles
-        default: 'salesperson'
+        enum: ['Babysitter', 'Mother', 'Admin'],
     },
-    
-    
 },
 {timestamps: true} 
 );
