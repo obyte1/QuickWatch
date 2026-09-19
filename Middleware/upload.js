@@ -1,35 +1,66 @@
 const multer = require('multer');
-const {CloudinaryStorage} = require('multer-storage-cloudinary');
 const cloudinary = require('../Config/clodinary');
 
-const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: {
-        folder: "bokusupermarket",
-        allowedFormats: ['jpg', 'jpeg', 'png', 'gif'],
-        transformation: [{ width: 500, height: 500, crop: "limit" }]
+const uploadToCloudinary = (file) => new Promise((resolve, reject) => {
+  const stream = cloudinary.uploader.upload_stream(
+    {
+      folder: 'quickwatch',
+      resource_type: 'auto',
+      transformation: [{ width: 500, height: 500, crop: 'limit' }],
+    },
+    (error, result) => {
+      if (error) return reject(error);
+      if (!result?.secure_url && !result?.url) {
+        return reject(new Error('Cloudinary upload returned no file URL.'));
+      }
+
+      resolve({
+        ...result,
+        path: result.secure_url || result.url,
+        url: result.secure_url || result.url,
+      });
     }
+  );
+
+  stream.end(file.buffer);
 });
 
-const upload = multer({ storage: storage });
+const withCloudinaryUpload = (handler) => (req, res, next) => {
+  handler(req, res, async (error) => {
+    if (error) return next(error);
 
-module.exports = upload;    
+    try {
+      if (req.file) {
+        const uploaded = await uploadToCloudinary(req.file);
+        req.file.path = uploaded.path;
+        req.file.url = uploaded.url;
+      }
 
-// const uploadToCloudinary = (buffer) => {
-//     return new Promise((resolve, reject) => {
-//         const stream = cloudinary.uploader.upload_stream(
-//             {
-//                 folder: "inventory-products"
-//             },
-//             (error, result) => {
-//                 if (error) {
-//                     reject(error);
-//                 } else {
-//                     resolve(result);
-//                 }
-//             }
-//         );
+      if (req.files) {
+        const files = Array.isArray(req.files)
+          ? req.files
+          : Object.values(req.files).flat();
 
-//         stream.end(buffer);
-//     });
-// };
+        await Promise.all(files.map(async (file) => {
+          const uploaded = await uploadToCloudinary(file);
+          file.path = uploaded.path;
+          file.url = uploaded.url;
+        }));
+      }
+
+      return next();
+    } catch (uploadError) {
+      return next(uploadError);
+    }
+  });
+};
+
+const memoryUpload = multer({ storage: multer.memoryStorage() });
+
+const upload = {
+  single: (fieldName) => withCloudinaryUpload(memoryUpload.single(fieldName)),
+  array: (fieldName, maxCount) => withCloudinaryUpload(memoryUpload.array(fieldName, maxCount)),
+  fields: (fields) => withCloudinaryUpload(memoryUpload.fields(fields)),
+};
+
+module.exports = upload;
