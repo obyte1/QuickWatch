@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const User = require('../Models/Users');
+const { normalizeRoles, getPrimaryRole } = require('../Models/Users');
 const Booking = require('../Models/Booking');
 const sendEmail = require('../Middleware/emailsender');
 const {
@@ -19,6 +20,7 @@ const generateToken = (user) => {
       id: user._id,
       email: user.Email,
       role: user.role,
+      roles: user.roles || normalizeRoles(user.role),
       status: user.status,
       emailVerified: user.emailVerified !== false,
     },
@@ -47,6 +49,7 @@ const sanitizeUser = (user) => ({
   ratingAverage: user.ratingAverage,
   ratingCount: user.ratingCount,
   role: user.role,
+  roles: user.roles || normalizeRoles(user.role),
   status: user.status,
   emailVerified: user.emailVerified,
   createdAt: user.createdAt,
@@ -137,6 +140,8 @@ exports.registerUser = async (req, res) => {
       Address,
       hourlyRate,
       role,
+      roles,
+      registeringFor,
     } = req.body;
 
     if (!FirstName || !LastName || !Email || !Password || !Gender || !Phone || !zipCode || !Address) {
@@ -151,11 +156,18 @@ exports.registerUser = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(Password, 10);
-    const normalizedRole = role || 'Mother';
-    if (normalizedRole === 'Babysitter' && (!Number.isFinite(Number(hourlyRate)) || Number(hourlyRate) <= 0)) {
+    const selectedRoles = normalizeRoles(roles || role || registeringFor || ['Mother']);
+    if (!selectedRoles.length) {
+      return res.status(400).json({ message: 'Please choose at least one valid role: Mother or Babysitter.' });
+    }
+
+    const isBabysitterRegistration = selectedRoles.includes('Babysitter');
+    if (isBabysitterRegistration && (!Number.isFinite(Number(hourlyRate)) || Number(hourlyRate) <= 0)) {
       return res.status(400).json({ message: 'hourlyRate is required and must be greater than zero for babysitters.' });
     }
+
     const verificationToken = crypto.randomBytes(32).toString('hex');
+    const primaryRole = getPrimaryRole(selectedRoles, 'Mother');
     const newUser = await User.create({
       FirstName: FirstName.trim(),
       LastName: LastName.trim(),
@@ -165,15 +177,16 @@ exports.registerUser = async (req, res) => {
       Phone: Phone.trim(),
       zipCode: zipCode.trim(),
       Address: Address.trim(),
-      hourlyRate: normalizedRole === 'Babysitter' ? Number(hourlyRate) : null,
-      role: normalizedRole,
-      status: normalizedRole === 'Babysitter' ? 'pendingReview' : 'Active',
+      hourlyRate: isBabysitterRegistration ? Number(hourlyRate) : null,
+      role: primaryRole,
+      roles: selectedRoles,
+      status: isBabysitterRegistration ? 'pendingReview' : 'Active',
       emailVerified: false,
       emailVerificationToken: crypto.createHash('sha256').update(verificationToken).digest('hex'),
       emailVerificationExpires: Date.now() + 24 * 60 * 60 * 1000,
     });
 
-    const message = normalizedRole === 'Babysitter'
+    const message = isBabysitterRegistration
       ? 'Babysitter application submitted successfully. Your account is pending admin review.'
       : 'User registered successfully.';
 
@@ -226,6 +239,13 @@ exports.loginUser = async (req, res) => {
       });
     }
 
+    const activeRoles = normalizeRoles(user.roles || user.role || 'Mother');
+    if (activeRoles.length && !user.roles) {
+      user.roles = activeRoles;
+      user.role = getPrimaryRole(activeRoles, 'Mother');
+      await user.save();
+    }
+
     return res.status(200).json({
       message: 'Login successful.',
       token: generateToken(user),
@@ -237,6 +257,88 @@ exports.loginUser = async (req, res) => {
       message: 'Error logging in user.',
       error: error.message,
     });
+  }
+};
+
+exports.switchDashboardRole = async (req, res) => {
+  try {
+    const { role } = req.body;
+    const userId = req.user?.id || req.user?._id;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    const roles = normalizeRoles(user.roles || user.role || 'Mother');
+    const requestedRole = normalizeRoles(role || user.role || 'Mother');
+    const targetRole = requestedRole[0];
+
+    if (!roles.includes(targetRole)) {
+      return res.status(400).json({ message: `This account is not onboarded for ${targetRole}.` });
+    }
+
+    user.role = targetRole;
+    await user.save();
+
+    return res.status(200).json({
+      message: `Dashboard switched to ${targetRole}.`,
+      user: sanitizeUser(user),
+      token: generateToken(user),
+    });
+  } catch (error) {
+    console.error('switchDashboardRole error:', error);
+    return res.status(500).json({ message: 'Error switching dashboard role.', error: error.message });
+  }
+};
+
+exports.onboardRole = async (req, res) => {
+  try {
+    const { role, hourlyRate } = req.body;
+    const userId = req.user?.id || req.user?._id;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    const selectedRoles = normalizeRoles(user.roles || user.role || 'Mother');
+    const targetRole = normalizeRoles(role || 'Mother')[0];
+
+    if (!targetRole || !['Mother', 'Babysitter'].includes(targetRole)) {
+      return res.status(400).json({ message: 'Role must be Mother or Babysitter.' });
+    }
+
+    if (targetRole === 'Babysitter') {
+      if (!Number.isFinite(Number(hourlyRate)) || Number(hourlyRate) <= 0) {
+        return res.status(400).json({ message: 'hourlyRate is required and must be greater than zero for babysitters.' });
+      }
+      user.hourlyRate = Number(hourlyRate);
+      if (!selectedRoles.includes('Babysitter')) {
+        selectedRoles.push('Babysitter');
+      }
+      user.status = 'pendingReview';
+    }
+
+    if (targetRole === 'Mother') {
+      if (!selectedRoles.includes('Mother')) {
+        selectedRoles.push('Mother');
+      }
+      user.status = 'Active';
+    }
+
+    user.roles = selectedRoles;
+    user.role = getPrimaryRole(user.roles, 'Mother');
+    await user.save();
+
+    return res.status(200).json({
+      message: `${targetRole} onboarding completed.`,
+      user: sanitizeUser(user),
+      token: generateToken(user),
+    });
+  } catch (error) {
+    console.error('onboardRole error:', error);
+    return res.status(500).json({ message: 'Error onboarding role.', error: error.message });
   }
 };
 

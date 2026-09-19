@@ -80,6 +80,8 @@ const {
   getBabysitters,
   getPendingBabysitters,
   updateUserStatus,
+  switchDashboardRole,
+  onboardRole,
 } = require('../Controllers/UserController');
 const { protect } = require('../Middleware/auth');
 const { authorize } = require('../Middleware/role');
@@ -233,6 +235,8 @@ router.post('/resend-verification', passwordLimiter, resendVerificationEmail);
  */
 router.get('/babysitters', protect, getBabysitters);
 router.get('/me', protect, getMyProfile);
+router.post('/me/switch-role', protect, requireActive, switchDashboardRole);
+router.post('/me/onboard-role', protect, requireActive, onboardRole);
 /**
  * @swagger
  * /users/me/profile:

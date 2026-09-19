@@ -1,6 +1,40 @@
 const mongose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+const USER_ROLES = ['Mother', 'Babysitter', 'Admin'];
+
+const normalizeRoles = (input) => {
+    const values = Array.isArray(input) ? input : [input];
+    const normalized = values
+      .flatMap((value) => String(value || '')
+        .split(',')
+        .map((part) => part.trim()))
+      .filter(Boolean)
+      .map((value) => {
+        const cleaned = value.replace(/[_-]/g, ' ');
+        const exactRole = USER_ROLES.find((role) => role.toLowerCase() === cleaned.toLowerCase());
+        if (exactRole) return exactRole;
+        const aliasMap = {
+          sitter: 'Babysitter',
+          babysitter: 'Babysitter',
+          mom: 'Mother',
+          mother: 'Mother',
+          admin: 'Admin',
+        };
+        return aliasMap[cleaned.toLowerCase()] || cleaned;
+      })
+      .filter((value) => USER_ROLES.includes(value))
+      .filter((value, index, array) => array.indexOf(value) === index);
+
+    return normalized;
+};
+
+const getPrimaryRole = (input, fallback = 'Mother') => {
+    const roles = normalizeRoles(input);
+    if (roles.length) return roles[0];
+    return fallback;
+};
+
 const userSchema = new mongose.Schema({
     FirstName: {
         type: String,
@@ -101,9 +135,14 @@ const userSchema = new mongose.Schema({
         default: 0,
         min: 0
     },
+    roles: {
+        type: [String],
+        enum: USER_ROLES,
+        default: ['Mother'],
+    },
     role: {
         type: String,
-        enum: ['Babysitter', 'Mother', 'Admin'],
+        enum: USER_ROLES,
         default: 'Mother'
     },
     status: {
@@ -150,7 +189,23 @@ const userSchema = new mongose.Schema({
 {timestamps: true} 
 );
 
+userSchema.pre('validate', function(next) {
+    const selectedRoles = normalizeRoles(this.roles && this.roles.length ? this.roles : (this.role ? this.role : ['Mother']));
+    if (selectedRoles.length === 0) {
+        this.roles = ['Mother'];
+        this.role = 'Mother';
+        return next();
+    }
+
+    this.roles = selectedRoles;
+    this.role = getPrimaryRole(selectedRoles, 'Mother');
+    next();
+});
+
 //create model from schema
 const User = mongose.model('User', userSchema);
 
-module.exports = User; //export the model to be used in other files
+module.exports = User;
+module.exports.USER_ROLES = USER_ROLES;
+module.exports.normalizeRoles = normalizeRoles;
+module.exports.getPrimaryRole = getPrimaryRole;

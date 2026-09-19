@@ -1,0 +1,1696 @@
+{
+    "variable":  [
+                     {
+                         "key":  "base_url",
+                         "type":  "string",
+                         "value":  "localhost:8000"
+                     },
+                     {
+                         "key":  "authToken",
+                         "type":  "string",
+                         "value":  ""
+                     }
+                 ],
+    "info":  {
+                 "description":  "Full API collection for the QuickWatch backend including auth, users, bookings, payments, notifications, admin, reviews, KYC, and settings.",
+                 "name":  "QuickWatch API",
+                 "schema":  "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+             },
+    "item":  [
+                 {
+                     "name":  "Users",
+                     "item":  [
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"FirstName\": \"Jane\",\n  \"LastName\": \"Doe\",\n  \"Email\": \"jane@example.com\",\n  \"Password\": \"Password123!\",\n  \"Gender\": \"Female\",\n  \"Phone\": \"+1234567890\",\n  \"zipCode\": \"10001\",\n  \"Address\": \"123 Main Street\",\n  \"roles\": [\"Mother\", \"Babysitter\"],\n  \"hourlyRate\": 25\n}",
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/users/register",
+                                                                  "path":  [
+                                                                               "users",
+                                                                               "register"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Register user",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"Email\": \"jane@example.com\",\n  \"Password\": \"Password123!\"\n}",
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/users/login",
+                                                                  "path":  [
+                                                                               "users",
+                                                                               "login"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Login user",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/users/forgot-password",
+                                                                  "path":  [
+                                                                               "users",
+                                                                               "forgot-password"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Forgot password",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/users/reset-password",
+                                                                  "path":  [
+                                                                               "users",
+                                                                               "reset-password"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Reset password",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/users/verify-email?token=your-token\u0026email=jane@example.com",
+                                                                  "path":  [
+                                                                               "users",
+                                                                               "verify-email?token=your-token\u0026email=jane@example.com"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+
+                                                                 ]
+                                                  },
+                                      "name":  "Verify email",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/users/resend-verification",
+                                                                  "path":  [
+                                                                               "users",
+                                                                               "resend-verification"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Resend verification",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/users/babysitters?date=2026-09-25\u0026startTime=09:00\u0026endTime=12:00",
+                                                                  "path":  [
+                                                                               "users",
+                                                                               "babysitters?date=2026-09-25\u0026startTime=09:00\u0026endTime=12:00"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Get babysitters",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/users/me",
+                                                                  "path":  [
+                                                                               "users",
+                                                                               "me"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Get my profile",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/users/me/switch-role",
+                                                                  "path":  [
+                                                                               "users",
+                                                                               "me",
+                                                                               "switch-role"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Switch dashboard role",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/users/me/onboard-role",
+                                                                  "path":  [
+                                                                               "users",
+                                                                               "me",
+                                                                               "onboard-role"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Onboard role",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "raw":  "{ \"about\": \"Loving and experienced parent.\" }",
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "method":  "PATCH",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/users/me/profile",
+                                                                  "path":  [
+                                                                               "users",
+                                                                               "me",
+                                                                               "profile"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Update profile",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/users/pending-babysitters",
+                                                                  "path":  [
+                                                                               "users",
+                                                                               "pending-babysitters"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Pending babysitters",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/users/status/64f1a8ab0d3ce5a0a64dd6c1",
+                                                                  "path":  [
+                                                                               "users",
+                                                                               "status",
+                                                                               "64f1a8ab0d3ce5a0a64dd6c1"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Update user status",
+                                      "response":  [
+
+                                                   ]
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Bookings",
+                     "item":  [
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "raw":  "{\n  \"selectedStartDate\": \"2026-09-25\",\n  \"startTime\": \"09:00\",\n  \"endTime\": \"12:00\",\n  \"location\": \"Lagos\",\n  \"address\": \"Lekki Phase 1\",\n  \"zipcode\": \"10001\",\n  \"watcherRole\": \"Babysitter\",\n  \"motherName\": \"Jane Doe\",\n  \"babysitterId\": \"64f1a8ab0d3ce5a0a64dd6c1\",\n  \"requestedAmount\": 2500,\n  \"specialInstructions\": \"Please bring snacks.\"\n}",
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/bookings",
+                                                                  "path":  [
+                                                                               "bookings"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Create booking",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/bookings/my-bookings",
+                                                                  "path":  [
+                                                                               "bookings",
+                                                                               "my-bookings"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Get my bookings",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/bookings/requests",
+                                                                  "path":  [
+                                                                               "bookings",
+                                                                               "requests"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Get babysitter requests",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "raw":  "{ \"requestedAmount\": 3000 }",
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "method":  "PATCH",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/bookings/64f1a8ab0d3ce5a0a64dd6c1/details",
+                                                                  "path":  [
+                                                                               "bookings",
+                                                                               "64f1a8ab0d3ce5a0a64dd6c1",
+                                                                               "details"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Update booking details",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "raw":  "{ \"accepted\": true }",
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/bookings/64f1a8ab0d3ce5a0a64dd6c1/accept",
+                                                                  "path":  [
+                                                                               "bookings",
+                                                                               "64f1a8ab0d3ce5a0a64dd6c1",
+                                                                               "accept"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Accept booking",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "raw":  "{ \"amount\": 2500, \"currency\": \"usd\" }",
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/bookings/64f1a8ab0d3ce5a0a64dd6c1/confirm-completion",
+                                                                  "path":  [
+                                                                               "bookings",
+                                                                               "64f1a8ab0d3ce5a0a64dd6c1",
+                                                                               "confirm-completion"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Confirm completion payment",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "raw":  "{ \"status\": true, \"confirm\": true }",
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "method":  "PATCH",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/bookings/64f1a8ab0d3ce5a0a64dd6c1",
+                                                                  "path":  [
+                                                                               "bookings",
+                                                                               "64f1a8ab0d3ce5a0a64dd6c1"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Update booking status",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "raw":  "{ \"reason\": \"Mother changed plans.\" }",
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/bookings/64f1a8ab0d3ce5a0a64dd6c1/cancel",
+                                                                  "path":  [
+                                                                               "bookings",
+                                                                               "64f1a8ab0d3ce5a0a64dd6c1",
+                                                                               "cancel"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Cancel booking",
+                                      "response":  [
+
+                                                   ]
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Chats",
+                     "item":  [
+                                  {
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/chats",
+                                                                  "path":  [
+                                                                               "chats"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Send message",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/chats/booking/64f1a8ab0d3ce5a0a64dd6c1",
+                                                                  "path":  [
+                                                                               "chats",
+                                                                               "booking",
+                                                                               "64f1a8ab0d3ce5a0a64dd6c1"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Get booking messages",
+                                      "response":  [
+
+                                                   ]
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Payments",
+                     "item":  [
+                                  {
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/payments",
+                                                                  "path":  [
+                                                                               "payments"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Create payment",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/payments",
+                                                                  "path":  [
+                                                                               "payments"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Get payments",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/payments/bookings/64f1a8ab0d3ce5a0a64dd6c1/confirm",
+                                                                  "path":  [
+                                                                               "payments",
+                                                                               "bookings",
+                                                                               "64f1a8ab0d3ce5a0a64dd6c1",
+                                                                               "confirm"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Confirm completion payment",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/payments/payout-account",
+                                                                  "path":  [
+                                                                               "payments",
+                                                                               "payout-account"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Create payout account",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/payments/payout-account",
+                                                                  "path":  [
+                                                                               "payments",
+                                                                               "payout-account"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Get payout account",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/payments/bookings/64f1a8ab0d3ce5a0a64dd6c1/request-payout",
+                                                                  "path":  [
+                                                                               "payments",
+                                                                               "bookings",
+                                                                               "64f1a8ab0d3ce5a0a64dd6c1",
+                                                                               "request-payout"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Request payout",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/payments/bookings/64f1a8ab0d3ce5a0a64dd6c1/process-payout",
+                                                                  "path":  [
+                                                                               "payments",
+                                                                               "bookings",
+                                                                               "64f1a8ab0d3ce5a0a64dd6c1",
+                                                                               "process-payout"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Process payout (admin)",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "raw":  "{ \"reason\": \"Customer requested cancellation.\" }",
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/payments/bookings/64f1a8ab0d3ce5a0a64dd6c1/refund",
+                                                                  "path":  [
+                                                                               "payments",
+                                                                               "bookings",
+                                                                               "64f1a8ab0d3ce5a0a64dd6c1",
+                                                                               "refund"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Refund payment",
+                                      "response":  [
+
+                                                   ]
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Notifications",
+                     "item":  [
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/notifications",
+                                                                  "path":  [
+                                                                               "notifications"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Get notifications",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/notifications/unread-count",
+                                                                  "path":  [
+                                                                               "notifications",
+                                                                               "unread-count"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Get unread count",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/notifications/devices",
+                                                                  "path":  [
+                                                                               "notifications",
+                                                                               "devices"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Register device",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "DELETE",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/notifications/devices/device-token-123",
+                                                                  "path":  [
+                                                                               "notifications",
+                                                                               "devices",
+                                                                               "device-token-123"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Remove device",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/notifications/preferences",
+                                                                  "path":  [
+                                                                               "notifications",
+                                                                               "preferences"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Get preferences",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/notifications/preferences",
+                                                                  "path":  [
+                                                                               "notifications",
+                                                                               "preferences"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Update preferences",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/notifications/read-all",
+                                                                  "path":  [
+                                                                               "notifications",
+                                                                               "read-all"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Mark all as read",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/notifications/64f1a8ab0d3ce5a0a64dd6c1/read",
+                                                                  "path":  [
+                                                                               "notifications",
+                                                                               "64f1a8ab0d3ce5a0a64dd6c1",
+                                                                               "read"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Mark one notification as read",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "DELETE",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/notifications/64f1a8ab0d3ce5a0a64dd6c1",
+                                                                  "path":  [
+                                                                               "notifications",
+                                                                               "64f1a8ab0d3ce5a0a64dd6c1"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Delete notification",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "raw":  "{ \"userId\": \"64f1a8ab0d3ce5a0a64dd6c2\", \"title\": \"Test alert\", \"message\": \"Hello from admin.\" }",
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/notifications/send",
+                                                                  "path":  [
+                                                                               "notifications",
+                                                                               "send"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Send notification to user (admin)",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "raw":  "{ \"title\": \"Platform update\", \"message\": \"Maintenance scheduled tonight.\" }",
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/notifications/broadcast",
+                                                                  "path":  [
+                                                                               "notifications",
+                                                                               "broadcast"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Broadcast notification (admin)",
+                                      "response":  [
+
+                                                   ]
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Admin",
+                     "item":  [
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/admin/overview",
+                                                                  "path":  [
+                                                                               "admin",
+                                                                               "overview"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Get overview",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/admin/users",
+                                                                  "path":  [
+                                                                               "admin",
+                                                                               "users"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Get users",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/admin/users/64f1a8ab0d3ce5a0a64dd6c1",
+                                                                  "path":  [
+                                                                               "admin",
+                                                                               "users",
+                                                                               "64f1a8ab0d3ce5a0a64dd6c1"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Get user by id",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/admin/users/64f1a8ab0d3ce5a0a64dd6c1/status",
+                                                                  "path":  [
+                                                                               "admin",
+                                                                               "users",
+                                                                               "64f1a8ab0d3ce5a0a64dd6c1",
+                                                                               "status"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Update user status",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/admin/bookings",
+                                                                  "path":  [
+                                                                               "admin",
+                                                                               "bookings"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Get bookings",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/admin/bookings/64f1a8ab0d3ce5a0a64dd6c1/chat",
+                                                                  "path":  [
+                                                                               "admin",
+                                                                               "bookings",
+                                                                               "64f1a8ab0d3ce5a0a64dd6c1",
+                                                                               "chat"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Get booking chat",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/admin/payments",
+                                                                  "path":  [
+                                                                               "admin",
+                                                                               "payments"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Get payments",
+                                      "response":  [
+
+                                                   ]
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Reviews",
+                     "item":  [
+                                  {
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/reviews/bookings/64f1a8ab0d3ce5a0a64dd6c1",
+                                                                  "path":  [
+                                                                               "reviews",
+                                                                               "bookings",
+                                                                               "64f1a8ab0d3ce5a0a64dd6c1"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Create review",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/reviews/babysitters/64f1a8ab0d3ce5a0a64dd6c2",
+                                                                  "path":  [
+                                                                               "reviews",
+                                                                               "babysitters",
+                                                                               "64f1a8ab0d3ce5a0a64dd6c2"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Get babysitter reviews",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/reviews/mothers/64f1a8ab0d3ce5a0a64dd6c1",
+                                                                  "path":  [
+                                                                               "reviews",
+                                                                               "mothers",
+                                                                               "64f1a8ab0d3ce5a0a64dd6c1"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Get mother reviews",
+                                      "response":  [
+
+                                                   ]
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "KYC",
+                     "item":  [
+                                  {
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/kyc",
+                                                                  "path":  [
+                                                                               "kyc"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Submit KYC",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/kyc/me",
+                                                                  "path":  [
+                                                                               "kyc",
+                                                                               "me"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Get my KYC",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/kyc",
+                                                                  "path":  [
+                                                                               "kyc"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Get KYC applications",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "raw":  "{ \"status\": \"approved\" }",
+                                                                   "mode":  "raw"
+                                                               },
+                                                      "method":  "PATCH",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/kyc/64f1a8ab0d3ce5a0a64dd6c1/review",
+                                                                  "path":  [
+                                                                               "kyc",
+                                                                               "64f1a8ab0d3ce5a0a64dd6c1",
+                                                                               "review"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Review KYC",
+                                      "response":  [
+
+                                                   ]
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Settings",
+                     "item":  [
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/settings/company",
+                                                                  "path":  [
+                                                                               "settings",
+                                                                               "company"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Get company settings",
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "protocol":  "http",
+                                                                  "raw":  "{{base_url}}/settings/company",
+                                                                  "path":  [
+                                                                               "settings",
+                                                                               "company"
+                                                                           ]
+                                                              },
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{authToken}}"
+                                                                     }
+                                                                 ]
+                                                  },
+                                      "name":  "Update company settings",
+                                      "response":  [
+
+                                                   ]
+                                  }
+                              ]
+                 }
+             ]
+}
