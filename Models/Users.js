@@ -189,17 +189,16 @@ const userSchema = new mongose.Schema({
 {timestamps: true} 
 );
 
-userSchema.pre('validate', function(next) {
+userSchema.pre('validate', function() {
     const selectedRoles = normalizeRoles(this.roles && this.roles.length ? this.roles : (this.role ? this.role : ['Mother']));
     if (selectedRoles.length === 0) {
         this.roles = ['Mother'];
         this.role = 'Mother';
-        return next();
+        return;
     }
 
     this.roles = selectedRoles;
     this.role = getPrimaryRole(selectedRoles, 'Mother');
-    next();
 });
 
 //create model from schema

@@ -10,7 +10,7 @@ const options = {
     },
     servers: [
       {
-        url: `http://localhost:${process.env.PORT || 8000}`,
+        url: process.env.API_URL || `http://localhost:${process.env.PORT || 8000}`,
       },
     ],
     components: {

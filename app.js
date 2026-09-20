@@ -1,5 +1,7 @@
 const express = require('express');
 const http = require('http');
+const dotenv = require('dotenv');
+dotenv.config();
 const { Server } = require('socket.io');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger');
@@ -17,9 +19,6 @@ const io = new Server(server, {
   }
 });
 setIo(io);
-
-const dotenv = require('dotenv');
-dotenv.config(); // Load environment variables from .env file
 
 const userRoute = require('./Routes/UserRoute');
 const bookingRoute = require('./Routes/BookingRoute');
@@ -42,6 +41,7 @@ app.post('/payments/webhook', express.raw({ type: 'application/json' }), handleS
 app.use(helmet());
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 300, standardHeaders: 'draft-8', legacyHeaders: false }));
 app.use(express.json()); //middleware to parse JSON request bodies
+app.get('/swagger.json', (req, res) => res.json(swaggerSpec));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/users', userRoute); //use the user route for all requests starting with /users
 app.use('/bookings', bookingRoute);
