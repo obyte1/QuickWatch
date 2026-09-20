@@ -3,6 +3,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger');
+const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const jwt = require('jsonwebtoken');
@@ -32,6 +33,11 @@ const settingsRoute = require('./Routes/SettingsRoute');
 const { handleStripeWebhook } = require('./Controllers/PaymentController');
 const Booking = require('./Models/Booking');
 
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 app.post('/payments/webhook', express.raw({ type: 'application/json' }), handleStripeWebhook);
 app.use(helmet());
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 300, standardHeaders: 'draft-8', legacyHeaders: false }));
