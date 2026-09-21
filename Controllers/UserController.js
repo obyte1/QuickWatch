@@ -100,7 +100,8 @@ const sendVerificationEmail = async (user) => {
   user.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000;
   await user.save();
 
-  const verificationLink = `${process.env.EMAIL_VERIFICATION_URL || `http://localhost:${process.env.PORT || 8000}/users/verify-email`}?token=${verificationToken}&email=${encodeURIComponent(user.Email)}`;
+  const verificationBaseUrl = `${process.env.API_URL || `http://localhost:${process.env.PORT || 8000}`}/users/verify-email`;
+  const verificationLink = `${verificationBaseUrl}?token=${verificationToken}&email=${encodeURIComponent(user.Email)}`;
   await sendEmail(
     user.Email,
     'Verify your QuickWatch email address',
