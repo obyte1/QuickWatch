@@ -11,7 +11,7 @@ const stripe = process.env.STRIPE_SECRET_KEY
   : null;
 
 const getUserId = (req) => req.user?.id || req.user?._id;
-const getOrganizationEmail = () => process.env.ORGANIZATION_EMAIL || process.env.EMAIL_USER;
+const getOrganizationEmail = () => process.env.ORGANIZATION_EMAIL || process.env.EMAIL_FROM;
 
 const requireStripe = (res) => {
   if (!stripe) {

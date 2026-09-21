@@ -93,6 +93,21 @@ const isAvailabilityBooking = (booking) => (
   )
 );
 
+
+const sendVerificationEmail = async (user) => {
+  const verificationToken = crypto.randomBytes(32).toString('hex');
+  user.emailVerificationToken = crypto.createHash('sha256').update(verificationToken).digest('hex');
+  user.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000;
+  await user.save();
+
+  const verificationLink = `${process.env.EMAIL_VERIFICATION_URL || `http://localhost:${process.env.PORT || 8000}/users/verify-email`}?token=${verificationToken}&email=${encodeURIComponent(user.Email)}`;
+  await sendEmail(
+    user.Email,
+    'Verify your QuickWatch email address',
+    emailVerificationTemplate({ firstName: user.FirstName, verificationLink }),
+    `Verify your QuickWatch email address by opening this link: ${verificationLink}`
+  );
+};
 const getAvailability = (bookings, requestedDate, requestedStart, requestedEnd) => {
   const activeBookings = bookings.filter(isAvailabilityBooking);
   const bookedSlots = activeBookings.map((booking) => ({
@@ -149,9 +164,18 @@ exports.registerUser = async (req, res) => {
     }
 
     const normalizedEmail = Email.trim().toLowerCase();
-    const existingUser = await User.findOne({ Email: normalizedEmail });
+    const existingUser = await User.findOne({ Email: normalizedEmail })
+      .select('+emailVerificationToken +emailVerificationExpires');
 
     if (existingUser) {
+      if (existingUser.emailVerified === false) {
+        await sendVerificationEmail(existingUser);
+        return res.status(200).json({
+          message: 'A verification email has been resent. Please check your inbox.',
+          requiresEmailVerification: true,
+          user: sanitizeUser(existingUser),
+        });
+      }
       return res.status(400).json({ message: 'A user with this email already exists.' });
     }
 
@@ -166,7 +190,6 @@ exports.registerUser = async (req, res) => {
       return res.status(400).json({ message: 'hourlyRate is required and must be greater than zero for babysitters.' });
     }
 
-    const verificationToken = crypto.randomBytes(32).toString('hex');
     const primaryRole = getPrimaryRole(selectedRoles, 'Mother');
     const newUser = await User.create({
       FirstName: FirstName.trim(),
@@ -182,21 +205,13 @@ exports.registerUser = async (req, res) => {
       roles: selectedRoles,
       status: isBabysitterRegistration ? 'pendingReview' : 'Active',
       emailVerified: false,
-      emailVerificationToken: crypto.createHash('sha256').update(verificationToken).digest('hex'),
-      emailVerificationExpires: Date.now() + 24 * 60 * 60 * 1000,
     });
 
     const message = isBabysitterRegistration
       ? 'Babysitter application submitted successfully. Your account is pending admin review.'
       : 'User registered successfully.';
 
-    const verificationLink = `${process.env.EMAIL_VERIFICATION_URL || `http://localhost:${process.env.PORT || 8000}/users/verify-email`}?token=${verificationToken}&email=${encodeURIComponent(newUser.Email)}`;
-    await sendEmail(
-      newUser.Email,
-      'Verify your QuickWatch email address',
-      emailVerificationTemplate({ firstName: newUser.FirstName, verificationLink }),
-      `Verify your QuickWatch email address by opening this link: ${verificationLink}`
-    );
+    await sendVerificationEmail(newUser);
     return res.status(201).json({
       message,
       requiresEmailVerification: true,
@@ -387,12 +402,7 @@ exports.resendVerificationEmail = async (req, res) => {
     const user = await User.findOne({ Email: normalizedEmail }).select('+emailVerificationToken +emailVerificationExpires');
     if (!user || user.emailVerified) return res.status(200).json({ message: 'If the account requires verification, a new email has been sent.' });
 
-    const verificationToken = crypto.randomBytes(32).toString('hex');
-    user.emailVerificationToken = crypto.createHash('sha256').update(verificationToken).digest('hex');
-    user.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000;
-    await user.save();
-    const verificationLink = `${process.env.EMAIL_VERIFICATION_URL || `http://localhost:${process.env.PORT || 8000}/users/verify-email`}?token=${verificationToken}&email=${encodeURIComponent(user.Email)}`;
-    await sendEmail(user.Email, 'Verify your QuickWatch email address', emailVerificationTemplate({ firstName: user.FirstName, verificationLink }), `Verify your email: ${verificationLink}`);
+    await sendVerificationEmail(user);
     return res.status(200).json({ message: 'If the account requires verification, a new email has been sent.' });
   } catch (error) {
     console.error('resendVerificationEmail error:', error);

@@ -105,6 +105,8 @@ const { requireActive } = require('../Middleware/accountStatus');
  *     responses:
  *       201:
  *         description: User created successfully
+ *       200:
+ *         description: Verification email resent for an existing unverified user
  */
 router.post('/register', authLimiter, validateRegistration, registerUser);
 
