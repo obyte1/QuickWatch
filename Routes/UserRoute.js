@@ -73,6 +73,8 @@ const router = express.Router();
 const {
   registerUser,
   loginUser,
+  registerBiometricDevice,
+  loginWithBiometric,
   forgotPassword,
   resetPassword,
   verifyEmail,
@@ -127,6 +129,55 @@ router.post('/register', authLimiter, validateRegistration, registerUser);
  *         description: Login successful
  */
 router.post('/login', authLimiter, validateLogin, loginUser);
+
+/**
+ * @swagger
+ * /users/register-biometric:
+ *   post:
+ *     summary: Register a biometric-enabled device for a user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [Email, Password, deviceId]
+ *             properties:
+ *               Email: { type: string, format: email }
+ *               Password: { type: string }
+ *               deviceId: { type: string }
+ *               deviceName: { type: string }
+ *               credentialId: { type: string }
+ *               publicKey: { type: string }
+ *     responses:
+ *       200:
+ *         description: Biometric device registered successfully
+ */
+router.post('/register-biometric', authLimiter, registerBiometricDevice);
+
+/**
+ * @swagger
+ * /users/login-biometric:
+ *   post:
+ *     summary: Log in with a biometric-enabled device
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [Email, deviceId, biometricToken]
+ *             properties:
+ *               Email: { type: string, format: email }
+ *               deviceId: { type: string }
+ *               biometricToken: { type: string }
+ *     responses:
+ *       200:
+ *         description: Biometric login successful
+ */
+router.post('/login-biometric', authLimiter, loginWithBiometric);
 
 /**
  * @swagger

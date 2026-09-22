@@ -52,9 +52,16 @@ const sanitizeUser = (user) => ({
   roles: user.roles || normalizeRoles(user.role),
   status: user.status,
   emailVerified: user.emailVerified,
+  biometricEnabled: !!user.biometricEnabled,
+  biometricDevices: user.biometricDevices || [],
   createdAt: user.createdAt,
   updatedAt: user.updatedAt,
 });
+
+const buildBiometricToken = (user, deviceId) => {
+  const seed = `${user.Email}:${deviceId}:${user.Password}:${process.env.JWT_SECRET || 'quickwatch-biometric-secret'}`;
+  return crypto.createHash('sha256').update(seed).digest('hex');
+};
 
 const normalizeDate = (value) => {
   if (!value) return '';
@@ -273,6 +280,110 @@ exports.loginUser = async (req, res) => {
       message: 'Error logging in user.',
       error: error.message,
     });
+  }
+};
+
+exports.registerBiometricDevice = async (req, res) => {
+  try {
+    const { Email, Password, deviceId, deviceName, credentialId, publicKey } = req.body;
+
+    if (!Email || !Password || !deviceId) {
+      return res.status(400).json({ message: 'Email, password, and deviceId are required.' });
+    }
+
+    const normalizedEmail = String(Email).trim().toLowerCase();
+    const user = await User.findOne({ Email: normalizedEmail });
+
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid email or password.' });
+    }
+
+    const isPasswordValid = await bcrypt.compare(Password, user.Password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: 'Invalid email or password.' });
+    }
+
+    if (user.emailVerified === false) {
+      return res.status(403).json({
+        message: 'Please verify your email address before enabling biometric login.',
+        requiresEmailVerification: true,
+      });
+    }
+
+    const deviceRecord = {
+      deviceId: String(deviceId).trim(),
+      deviceName: deviceName || 'Unknown device',
+      credentialId: credentialId || '',
+      publicKey: publicKey || '',
+      lastUsedAt: new Date(),
+      createdAt: new Date(),
+    };
+
+    const existingDeviceIndex = user.biometricDevices?.findIndex((device) => device.deviceId === deviceRecord.deviceId) ?? -1;
+    if (existingDeviceIndex >= 0) {
+      user.biometricDevices[existingDeviceIndex] = { ...user.biometricDevices[existingDeviceIndex], ...deviceRecord };
+    } else {
+      user.biometricDevices = [...(user.biometricDevices || []), deviceRecord];
+    }
+
+    user.biometricEnabled = true;
+    await user.save();
+
+    return res.status(200).json({
+      message: 'Biometric device registered successfully.',
+      device: deviceRecord,
+      biometricToken: buildBiometricToken(user, deviceRecord.deviceId),
+    });
+  } catch (error) {
+    console.error('registerBiometricDevice error:', error);
+    return res.status(500).json({ message: 'Error registering biometric device.', error: error.message });
+  }
+};
+
+exports.loginWithBiometric = async (req, res) => {
+  try {
+    const { Email, deviceId, biometricToken } = req.body;
+
+    if (!Email || !deviceId || !biometricToken) {
+      return res.status(400).json({ message: 'Email, deviceId and biometricToken are required.' });
+    }
+
+    const normalizedEmail = String(Email).trim().toLowerCase();
+    const user = await User.findOne({ Email: normalizedEmail });
+
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid biometric login attempt.' });
+    }
+
+    if (user.emailVerified === false) {
+      return res.status(403).json({
+        message: 'Please verify your email address before logging in.',
+        requiresEmailVerification: true,
+      });
+    }
+
+    const device = user.biometricDevices?.find((item) => item.deviceId === String(deviceId).trim());
+    if (!device) {
+      return res.status(401).json({ message: 'This device is not registered for biometric login.' });
+    }
+
+    const expectedToken = buildBiometricToken(user, device.deviceId);
+    if (biometricToken !== expectedToken) {
+      return res.status(401).json({ message: 'Invalid biometric login attempt.' });
+    }
+
+    device.lastUsedAt = new Date();
+    user.biometricEnabled = true;
+    await user.save();
+
+    return res.status(200).json({
+      message: 'Biometric login successful.',
+      token: generateToken(user),
+      user: sanitizeUser(user),
+    });
+  } catch (error) {
+    console.error('loginWithBiometric error:', error);
+    return res.status(500).json({ message: 'Error logging in with biometric credentials.', error: error.message });
   }
 };
 

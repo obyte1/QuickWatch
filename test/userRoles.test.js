@@ -12,3 +12,9 @@ test('getPrimaryRole keeps the first active role', () => {
   assert.equal(getPrimaryRole(['Mother', 'Babysitter']), 'Mother');
   assert.equal(getPrimaryRole('Babysitter'), 'Babysitter');
 });
+
+test('User schema supports biometric device enrollment', () => {
+  const User = require('../Models/Users');
+  assert.ok(User.schema.path('biometricDevices'));
+  assert.equal(User.schema.path('biometricDevices').instance, 'Array');
+});

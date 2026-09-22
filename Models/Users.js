@@ -124,6 +124,37 @@ const userSchema = new mongose.Schema({
         chat: { type: Boolean, default: true },
         marketing: { type: Boolean, default: false }
     },
+    biometricEnabled: {
+        type: Boolean,
+        default: false
+    },
+    biometricDevices: [{
+        deviceId: {
+            type: String,
+            required: true,
+            trim: true
+        },
+        deviceName: {
+            type: String,
+            default: 'Unknown device'
+        },
+        credentialId: {
+            type: String,
+            default: ''
+        },
+        publicKey: {
+            type: String,
+            default: ''
+        },
+        lastUsedAt: {
+            type: Date,
+            default: Date.now
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now
+        }
+    }],
     ratingAverage: {
         type: Number,
         default: 0,
