@@ -23,6 +23,30 @@ const safeUser = (user) => ({
   createdAt: user.createdAt,
 });
 
+const resolveStatusUpdate = (body = {}) => {
+  const actionMap = {
+    approve: 'Active',
+    approved: 'Active',
+    reject: 'Rejected',
+    rejected: 'Rejected',
+    suspend: 'Suspended',
+    suspended: 'Suspended',
+    review: 'pendingReview',
+    pendingreview: 'pendingReview',
+    'return-to-review': 'pendingReview',
+  };
+
+  const rawStatus = typeof body.status !== 'undefined' ? body.status : body.action;
+  const resolvedStatus = typeof rawStatus === 'string' ? actionMap[rawStatus.toLowerCase()] || rawStatus : null;
+
+  return {
+    status: resolvedStatus,
+    reason: typeof body.reason === 'string' ? body.reason : '',
+  };
+};
+
+module.exports.resolveStatusUpdate = resolveStatusUpdate;
+
 exports.getOverview = async (req, res) => {
   try {
     const [users, bookings, payments, payoutRequests, revenue] = await Promise.all([
@@ -51,7 +75,11 @@ exports.getOverview = async (req, res) => {
 
 exports.getUsers = async (req, res) => {
   try {
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
+    const search = String(req.query.search || '').trim();
     const filter = {};
+
     if (req.query.role) {
       const roleAliases = { babysitter: 'Babysitter', sitter: 'Babysitter', mother: 'Mother', admin: 'Admin' };
       const roles = String(req.query.role)
@@ -61,15 +89,39 @@ exports.getUsers = async (req, res) => {
         .map((role) => roleAliases[role.toLowerCase()] || role);
       filter.role = roles.length > 1 ? { $in: roles } : roles[0];
     }
+
     if (req.query.status) {
-      const statuses = String(req.query.status).split(',').map((status) => status.trim()).filter(Boolean);
+      const statuses = String(req.query.status)
+        .split(',')
+        .map((status) => status.trim())
+        .filter(Boolean);
       filter.status = statuses.length > 1 ? { $in: statuses } : statuses[0];
     }
+
+    if (search) {
+      filter.$or = [
+        { FirstName: { $regex: search, $options: 'i' } },
+        { LastName: { $regex: search, $options: 'i' } },
+        { Email: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    const total = await User.countDocuments(filter);
     const users = await User.find(filter)
       .select('-Password -resetPasswordToken -resetPasswordExpires -pushTokens -stripeAccountId')
       .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
       .lean();
-    return res.status(200).json({ count: users.length, users: users.map(safeUser) });
+
+    return res.status(200).json({
+      count: users.length,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      users: users.map(safeUser),
+    });
   } catch (error) {
     console.error('getUsers error:', error);
     return res.status(500).json({ message: 'Error fetching users.', error: error.message });
@@ -89,33 +141,138 @@ exports.getBabysitterById = async (req, res) => {
   }
 };
 
+exports.approveBabysitterRequest = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const payload = req.body || {};
+    const { action } = payload;
+    if (action && String(action).toLowerCase() === 'approve') {
+      // accepted as an alias for the dedicated approval endpoint
+    }
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Babysitter not found.' });
+    }
+
+    if (user.role !== 'Babysitter') {
+      return res.status(400).json({ message: 'Only babysitter accounts can be approved from this endpoint.' });
+    }
+
+    if (user.status === 'Active') {
+      return res.status(409).json({ message: 'This babysitter request is already approved.' });
+    }
+
+    if (user.status !== 'pendingReview') {
+      return res.status(400).json({ message: 'Only babysitter applications in pendingReview can be approved.' });
+    }
+
+    user.status = 'Active';
+    await user.save();
+
+    const html = approvalTemplate({ firstName: user.FirstName, role: user.role });
+    const message = 'Your QuickWatch babysitter application has been approved and your account is now active.';
+    const subject = 'Your QuickWatch babysitter account has been approved';
+
+    await sendEmail(user.Email, subject, html, message);
+    await notifyUser({
+      userId: user._id,
+      type: 'account.approved',
+      title: subject,
+      message,
+      data: { userId: user._id.toString(), status: 'Active', action: 'view_account' },
+    });
+
+    return res.status(200).json({
+      message: 'Babysitter request approved successfully.',
+      user: safeUser(user),
+    });
+  } catch (error) {
+    console.error('approveBabysitterRequest error:', error);
+    return res.status(500).json({ message: 'Error approving babysitter request.', error: error.message });
+  }
+};
+
+exports.rejectBabysitterRequest = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const payload = req.body || {};
+    const { reason = '' } = payload;
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Babysitter not found.' });
+    }
+
+    if (user.role !== 'Babysitter') {
+      return res.status(400).json({ message: 'Only babysitter accounts can be rejected from this endpoint.' });
+    }
+
+    if (!String(reason).trim()) {
+      return res.status(400).json({ message: 'reason is required when rejecting an application.' });
+    }
+
+    user.status = 'Rejected';
+    await user.save();
+
+    const subject = 'Your QuickWatch babysitter application was rejected';
+    const message = `Your babysitter application was rejected. Reason: ${reason}`;
+    const html = `<p>Hello ${user.FirstName},</p><p>${message}</p><p>Regards,<br />QuickWatch</p>`;
+
+    await sendEmail(user.Email, subject, html, message);
+    await notifyUser({
+      userId: user._id,
+      type: 'account.rejected',
+      title: subject,
+      message,
+      data: { userId: user._id.toString(), status: 'Rejected', action: 'view_account' },
+    });
+
+    return res.status(200).json({
+      message: 'Babysitter request rejected successfully.',
+      user: safeUser(user),
+    });
+  } catch (error) {
+    console.error('rejectBabysitterRequest error:', error);
+    return res.status(500).json({ message: 'Error rejecting babysitter request.', error: error.message });
+  }
+};
+
 exports.updateUserStatus = async (req, res) => {
   try {
-    const { status, reason = '' } = req.body;
+    const payload = req.body || {};
+    const { status: resolvedStatus, reason = '' } = resolveStatusUpdate(payload);
     const allowedStatuses = ['Active', 'Rejected', 'Suspended', 'pendingReview'];
-    if (!allowedStatuses.includes(status)) {
+
+    if (!resolvedStatus) {
+      return res.status(400).json({
+        message: 'Request body must include a status or action. Accepted values: Active, Rejected, Suspended, pendingReview, approve, reject, suspend, review.',
+      });
+    }
+
+    if (!allowedStatuses.includes(resolvedStatus)) {
       return res.status(400).json({ message: `status must be one of: ${allowedStatuses.join(', ')}.` });
     }
-    if (status === 'Rejected' && !String(reason).trim()) {
+    if (resolvedStatus === 'Rejected' && !String(reason).trim()) {
       return res.status(400).json({ message: 'reason is required when rejecting an account.' });
     }
 
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: 'User not found.' });
-    if (status === 'pendingReview' && user.role !== 'Babysitter') {
+    if (resolvedStatus === 'pendingReview' && user.role !== 'Babysitter') {
       return res.status(400).json({ message: 'Only babysitter accounts can be pending review.' });
     }
 
-    user.status = status;
+    user.status = resolvedStatus;
     await user.save();
 
-    const isApproval = status === 'Active';
-    const subject = isApproval ? 'Your QuickWatch account has been approved' : `Your QuickWatch account is ${status}`;
+    const isApproval = resolvedStatus === 'Active';
+    const subject = isApproval ? 'Your QuickWatch account has been approved' : `Your QuickWatch account is ${resolvedStatus}`;
     const message = isApproval
       ? 'Your QuickWatch account has been approved and is now active.'
-      : status === 'Rejected'
+      : resolvedStatus === 'Rejected'
         ? `Your babysitter application was rejected. Reason: ${reason}`
-        : `Your QuickWatch account status is now ${status}.`;
+        : `Your QuickWatch account status is now ${resolvedStatus}.`;
     const html = isApproval
       ? approvalTemplate({ firstName: user.FirstName, role: user.role })
       : `<p>Hello ${user.FirstName},</p><p>${message}</p>${reason ? `<p>Reason: ${reason}</p>` : ''}<p>Regards,<br />QuickWatch</p>`;
@@ -123,13 +280,13 @@ exports.updateUserStatus = async (req, res) => {
     await sendEmail(user.Email, subject, html, message);
     await notifyUser({
       userId: user._id,
-      type: isApproval ? 'account.approved' : `account.${status.toLowerCase()}`,
+      type: isApproval ? 'account.approved' : `account.${resolvedStatus.toLowerCase()}`,
       title: subject,
       message,
-      data: { userId: user._id.toString(), status, action: 'view_account' },
+      data: { userId: user._id.toString(), status: resolvedStatus, action: 'view_account' },
     });
 
-    return res.status(200).json({ message: `User status updated to ${status}.`, user: safeUser(user) });
+    return res.status(200).json({ message: `User status updated to ${resolvedStatus}.`, user: safeUser(user) });
   } catch (error) {
     console.error('admin updateUserStatus error:', error);
     return res.status(500).json({ message: 'Error updating user status.', error: error.message });

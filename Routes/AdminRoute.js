@@ -8,6 +8,8 @@ const {
 	getUsers,
 	getBabysitterById,
 	updateUserStatus,
+	approveBabysitterRequest,
+	rejectBabysitterRequest,
 	getBookings,
 	getPayments,
 } = require('../Controllers/AdminController');
@@ -32,8 +34,28 @@ router.get('/overview', getOverview);
  *     summary: List platform users
  *     tags: [Admin]
  *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: query
+ *         name: search
+ *         schema: { type: string }
+ *         description: Search by first name, last name, or email
+ *       - in: query
+ *         name: role
+ *         schema: { type: string }
+ *         description: Filter by role. Accepts multiple values as a comma-separated list, e.g. Mother,Babysitter
+ *       - in: query
+ *         name: status
+ *         schema: { type: string }
+ *         description: Filter by status. Accepts multiple values as a comma-separated list, e.g. Active,pendingReview
+ *       - in: query
+ *         name: page
+ *         schema: { type: integer, default: 1 }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 10 }
  *     responses:
- *       200: { description: Users returned }
+ *       200:
+ *         description: Users returned with pagination metadata and status in each user DTO
  */
 router.get('/users', getUsers);
 /**
@@ -85,15 +107,27 @@ router.get('/babysitters/:id', getBabysitterById);
  */
 router.patch('/users/:id/status', updateUserStatus);
 router.patch('/babysitters/:id/status', updateUserStatus);
+router.patch('/babysitters/:id/approve', approveBabysitterRequest);
+router.patch('/babysitters/:id/reject', rejectBabysitterRequest);
 /**
  * @swagger
- * /admin/babysitters/{id}/status:
+ * /admin/babysitters/{id}/approve:
  *   patch:
- *     summary: Approve or reject a babysitter account
+ *     summary: Approve a babysitter request
  *     tags: [Admin]
  *     security: [{ bearerAuth: [] }]
  *     responses:
- *       200: { description: Babysitter status updated and email sent }
+ *       200: { description: Babysitter request approved and email sent }
+ */
+/**
+ * @swagger
+ * /admin/babysitters/{id}/reject:
+ *   patch:
+ *     summary: Reject a babysitter request
+ *     tags: [Admin]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200: { description: Babysitter request rejected and email sent }
  */
 /**
  * @swagger
