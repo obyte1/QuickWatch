@@ -5,6 +5,7 @@ const { authorize } = require('../Middleware/role');
 const { requireActive } = require('../Middleware/accountStatus');
 const {
 	getOverview,
+	getUserSummaryCards,
 	getUsers,
 	getBabysitterById,
 	updateUserStatus,
@@ -27,6 +28,17 @@ router.use(protect, requireActive, authorize('Admin'));
  *       200: { description: Overview returned }
  */
 router.get('/overview', getOverview);
+router.get('/user-summary-cards', getUserSummaryCards);
+/**
+ * @swagger
+ * /admin/user-summary-cards:
+ *   get:
+ *     summary: Get counts for dashboard user, booking, and payment summary cards
+ *     tags: [Admin]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200: { description: Summary counts returned }
+ */
 /**
  * @swagger
  * /admin/users:
@@ -102,6 +114,24 @@ router.get('/babysitters/:id', getBabysitterById);
  *         name: id
  *         required: true
  *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [Active, Rejected, Suspended, pendingReview]
+ *                 description: Use status directly, or send action instead
+ *               action:
+ *                 type: string
+ *                 enum: [approve, reject, suspend, review]
+ *                 description: Alternate shorthand for status updates
+ *               reason:
+ *                 type: string
+ *                 description: Required when rejecting a user or babysitter request
  *     responses:
  *       200: { description: User status updated and email sent }
  */
@@ -116,6 +146,21 @@ router.patch('/babysitters/:id/reject', rejectBabysitterRequest);
  *     summary: Approve a babysitter request
  *     tags: [Admin]
  *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               action:
+ *                 type: string
+ *                 enum: [approve]
  *     responses:
  *       200: { description: Babysitter request approved and email sent }
  */
@@ -126,6 +171,22 @@ router.patch('/babysitters/:id/reject', rejectBabysitterRequest);
  *     summary: Reject a babysitter request
  *     tags: [Admin]
  *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [reason]
+ *             properties:
+ *               reason:
+ *                 type: string
+ *                 example: Your profile is incomplete
  *     responses:
  *       200: { description: Babysitter request rejected and email sent }
  */

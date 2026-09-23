@@ -73,6 +73,43 @@ exports.getOverview = async (req, res) => {
   }
 };
 
+exports.getUserSummaryCards = async (req, res) => {
+  try {
+    const [totalUsers, totalMothers, totalBabysitters, totalPendingReviews, totalRejected, totalBookings, totalPayments, successfulPayments, pendingPayoutRequests] = await Promise.all([
+      User.countDocuments(),
+      User.countDocuments({ role: 'Mother' }),
+      User.countDocuments({ role: 'Babysitter' }),
+      User.countDocuments({ status: 'pendingReview' }),
+      User.countDocuments({ status: 'Rejected' }),
+      Booking.countDocuments(),
+      Payment.countDocuments(),
+      Payment.aggregate([
+        { $match: { status: 'succeeded' } },
+        { $group: { _id: null, total: { $sum: '$amount' }, count: { $sum: 1 } } },
+      ]),
+      Booking.countDocuments({ payoutStatus: 'requested' }),
+    ]);
+
+    const paymentSummary = successfulPayments?.[0] || { total: 0, count: 0 };
+
+    return res.status(200).json({
+      totalUsers,
+      totalMothers,
+      totalBabysitters,
+      totalPendingReviews,
+      totalRejected,
+      totalBookings,
+      totalPayments,
+      successfulPaymentAmount: paymentSummary.total || 0,
+      successfulPaymentCount: paymentSummary.count || 0,
+      pendingPayoutRequests,
+    });
+  } catch (error) {
+    console.error('getUserSummaryCards error:', error);
+    return res.status(500).json({ message: 'Error fetching user summary cards.', error: error.message });
+  }
+};
+
 exports.getUsers = async (req, res) => {
   try {
     const page = Math.max(1, Number(req.query.page) || 1);
@@ -197,7 +234,7 @@ exports.rejectBabysitterRequest = async (req, res) => {
   try {
     const { id } = req.params;
     const payload = req.body || {};
-    const { reason = '' } = payload;
+    const reason = typeof payload.reason === 'string' ? payload.reason : '';
     const user = await User.findById(id);
 
     if (!user) {
