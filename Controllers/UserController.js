@@ -107,13 +107,16 @@ const sendVerificationEmail = async (user) => {
   user.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000;
   await user.save();
 
-  const verificationBaseUrl = `${process.env.API_URL || `http://localhost:${process.env.PORT || 8000}`}/users/verify-email`;
-  const verificationLink = `${verificationBaseUrl}?token=${verificationToken}&email=${encodeURIComponent(user.Email)}`;
+  const verificationBaseUrl = process.env.EMAIL_VERIFICATION_URL
+    || `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify-email`;
+  const verificationUrl = new URL(verificationBaseUrl);
+  verificationUrl.searchParams.set('token', verificationToken);
+  verificationUrl.searchParams.set('email', user.Email);
   await sendEmail(
     user.Email,
     'Verify your QuickWatch email address',
-    emailVerificationTemplate({ firstName: user.FirstName, verificationLink }),
-    `Verify your QuickWatch email address by opening this link: ${verificationLink}`
+    emailVerificationTemplate({ firstName: user.FirstName, verificationLink: verificationUrl.toString() }),
+    `Verify your QuickWatch email address by opening this link: ${verificationUrl.toString()}`
   );
 };
 const getAvailability = (bookings, requestedDate, requestedStart, requestedEnd) => {
