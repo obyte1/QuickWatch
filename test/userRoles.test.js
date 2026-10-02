@@ -18,3 +18,12 @@ test('User schema supports biometric device enrollment', () => {
   assert.ok(User.schema.path('biometricDevices'));
   assert.equal(User.schema.path('biometricDevices').instance, 'Array');
 });
+
+test('US states lookup contains 50 states with unique USPS abbreviations', () => {
+  const states = require('../Utility/usStates');
+  const abbreviations = states.map(({ abbreviation }) => abbreviation);
+
+  assert.equal(states.length, 50);
+  assert.equal(new Set(abbreviations).size, 50);
+  assert.ok(states.some(({ name, abbreviation }) => name === 'California' && abbreviation === 'CA'));
+});

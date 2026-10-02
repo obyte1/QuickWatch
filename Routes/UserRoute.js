@@ -84,6 +84,7 @@ const {
   updateUserStatus,
   switchDashboardRole,
   onboardRole,
+  getUsStates,
 } = require('../Controllers/UserController');
 const { protect } = require('../Middleware/auth');
 const { authorize } = require('../Middleware/role');
@@ -254,6 +255,18 @@ router.get('/verify-email', verifyEmail);
  *       200: { description: Verification email request accepted }
  */
 router.post('/resend-verification', passwordLimiter, resendVerificationEmail);
+
+/**
+ * @swagger
+ * /users/states:
+ *   get:
+ *     summary: Get the list of US states
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: US states with their USPS abbreviations
+ */
+router.get('/states', getUsStates);
 
 /**
  * @swagger

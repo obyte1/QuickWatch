@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../Models/Users');
 const { normalizeRoles, getPrimaryRole } = require('../Models/Users');
 const Booking = require('../Models/Booking');
+const usStates = require('../Utility/usStates');
 const sendEmail = require('../Middleware/emailsender');
 const {
   welcomeTemplate,
@@ -471,6 +472,8 @@ exports.onboardRole = async (req, res) => {
     return res.status(500).json({ message: 'Error onboarding role.', error: error.message });
   }
 };
+
+exports.getUsStates = (req, res) => res.status(200).json({ states: usStates });
 
 exports.verifyEmail = async (req, res) => {
   try {
