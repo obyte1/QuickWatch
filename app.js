@@ -33,6 +33,16 @@ const settingsRoute = require('./Routes/SettingsRoute');
 const { handleStripeWebhook } = require('./Controllers/PaymentController');
 const Booking = require('./Models/Booking');
 
+/**
+ * @swagger
+ * /swagger.json:
+ *   get:
+ *     summary: Get the generated OpenAPI specification
+ *     tags: [Documentation]
+ *     responses:
+ *       200:
+ *         description: OpenAPI specification returned
+ */
 app.use(cors({
   origin: '*',
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
@@ -115,4 +125,3 @@ connectDB(); // Connect to MongoDB
 server.listen(process.env.PORT, () => {
     console.log(`Server is running on port ${process.env.PORT}`);
 });
-

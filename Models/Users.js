@@ -229,7 +229,10 @@ userSchema.pre('validate', function() {
     }
 
     this.roles = selectedRoles;
-    this.role = getPrimaryRole(selectedRoles, 'Mother');
+    const currentRole = normalizeRoles(this.role)[0];
+    const keepCurrentRole = selectedRoles.includes(currentRole)
+      && (!this.isNew || this.isModified('role'));
+    this.role = keepCurrentRole ? currentRole : getPrimaryRole(selectedRoles, 'Mother');
 });
 
 //create model from schema

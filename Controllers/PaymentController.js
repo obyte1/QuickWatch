@@ -5,9 +5,10 @@ const WebhookEvent = require('../Models/WebhookEvent');
 const sendEmail = require('../Middleware/emailsender');
 const { paymentTemplate } = require('../Middleware/emailTemplates');
 const { notifyUser, notifyUsers } = require('../Services/notificationService');
-const stripe = process.env.STRIPE_SECRET_KEY
-  && !process.env.STRIPE_SECRET_KEY.includes('your_stripe_secret_key')
-  ? require('stripe')(process.env.STRIPE_SECRET_KEY)
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY?.trim();
+const stripe = stripeSecretKey
+  && !/(?:replace|placeholder|your[_-]?stripe|example)/i.test(stripeSecretKey)
+  ? require('stripe')(stripeSecretKey)
   : null;
 
 const getUserId = (req) => req.user?.id || req.user?._id;
@@ -15,8 +16,8 @@ const getOrganizationEmail = () => process.env.ORGANIZATION_EMAIL || process.env
 
 const requireStripe = (res) => {
   if (!stripe) {
-    res.status(500).json({
-      message: 'Stripe is not configured. Add a valid STRIPE_SECRET_KEY to your .env file.',
+    res.status(503).json({
+      message: 'Stripe is not configured. Replace the STRIPE_SECRET_KEY placeholder with a valid Stripe secret key.',
     });
     return false;
   }
@@ -151,6 +152,7 @@ exports.createPayoutAccount = async (req, res) => {
     if (req.user.role !== 'Babysitter') return res.status(403).json({ message: 'Only babysitters can set up payout details.' });
 
     const user = await User.findById(getUserId(req));
+    if (!user) return res.status(404).json({ message: 'User not found.' });
     const country = req.body.country || 'US';
     let account = user.stripeAccountId ? await stripe.accounts.retrieve(user.stripeAccountId) : null;
     if (!account) {

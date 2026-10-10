@@ -101,7 +101,6 @@ router.post('/devices', protect, requireActive, registerDevice);
  *       200: { description: Device removed }
  */
 router.delete('/devices/:token', protect, requireActive, removeDevice);
-router.get('/preferences', protect, requireActive, getPreferences);
 /**
  * @swagger
  * /notifications/preferences:
@@ -111,6 +110,31 @@ router.get('/preferences', protect, requireActive, getPreferences);
  *     security: [{ bearerAuth: [] }]
  *     responses:
  *       200: { description: Preferences returned }
+ */
+router.get('/preferences', protect, requireActive, getPreferences);
+/**
+ * @swagger
+ * /notifications/preferences:
+ *   patch:
+ *     summary: Update notification preferences
+ *     tags: [Notifications]
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               push: { type: boolean }
+ *               email: { type: boolean }
+ *               booking: { type: boolean }
+ *               payment: { type: boolean }
+ *               chat: { type: boolean }
+ *               marketing: { type: boolean }
+ *     responses:
+ *       200: { description: Preferences updated }
+ *       400: { description: A preference value is not boolean }
  */
 router.patch('/preferences', protect, requireActive, updatePreferences);
 

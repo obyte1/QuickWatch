@@ -182,6 +182,30 @@ router.post('/:bookingId/confirm-completion', protect, requireActive, createComp
  *         description: Booking updated successfully
  */
 router.patch('/:id', protect, requireActive, updateBookingStatus);
+/**
+ * @swagger
+ * /bookings/{id}/cancel:
+ *   post:
+ *     summary: Cancel a booking
+ *     tags: [Bookings]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               reason: { type: string }
+ *     responses:
+ *       200: { description: Booking cancelled }
+ *       404: { description: Booking not found }
+ */
 router.post('/:id/cancel', protect, requireActive, cancelBooking);
 
 module.exports = router;

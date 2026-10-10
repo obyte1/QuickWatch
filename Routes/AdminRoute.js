@@ -136,6 +136,35 @@ router.get('/babysitters/:id', getBabysitterById);
  *       200: { description: User status updated and email sent }
  */
 router.patch('/users/:id/status', updateUserStatus);
+/**
+ * @swagger
+ * /admin/babysitters/{id}/status:
+ *   patch:
+ *     summary: Update a babysitter's status
+ *     tags: [Admin]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [Active, Rejected, Suspended, pendingReview]
+ *               action:
+ *                 type: string
+ *                 enum: [approve, reject, suspend, review]
+ *               reason: { type: string }
+ *     responses:
+ *       200: { description: Babysitter status updated }
+ */
 router.patch('/babysitters/:id/status', updateUserStatus);
 router.patch('/babysitters/:id/approve', approveBabysitterRequest);
 router.patch('/babysitters/:id/reject', rejectBabysitterRequest);

@@ -405,6 +405,10 @@ exports.switchDashboardRole = async (req, res) => {
     const requestedRole = normalizeRoles(role || user.role || 'Mother');
     const targetRole = requestedRole[0];
 
+    if (!targetRole) {
+      return res.status(400).json({ message: 'A valid role is required.' });
+    }
+
     if (!roles.includes(targetRole)) {
       return res.status(400).json({ message: `This account is not onboarded for ${targetRole}.` });
     }
@@ -459,7 +463,7 @@ exports.onboardRole = async (req, res) => {
     }
 
     user.roles = selectedRoles;
-    user.role = getPrimaryRole(user.roles, 'Mother');
+    user.role = targetRole;
     await user.save();
 
     return res.status(200).json({

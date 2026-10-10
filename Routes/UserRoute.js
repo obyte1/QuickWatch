@@ -300,8 +300,66 @@ router.get('/states', getUsStates);
  *         description: Babysitter profiles and availability returned
  */
 router.get('/babysitters', protect, getBabysitters);
+/**
+ * @swagger
+ * /users/me:
+ *   get:
+ *     summary: Get the authenticated user's profile
+ *     tags: [Users]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200: { description: Profile returned }
+ *       401: { description: Authentication required }
+ */
 router.get('/me', protect, getMyProfile);
+/**
+ * @swagger
+ * /users/me/switch-role:
+ *   post:
+ *     summary: Switch to another role already enabled on the account
+ *     tags: [Users]
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [role]
+ *             properties:
+ *               role:
+ *                 type: string
+ *                 enum: [Mother, Babysitter]
+ *     responses:
+ *       200: { description: Active dashboard role and refreshed token returned }
+ *       400: { description: Role is not enabled on the account }
+ */
 router.post('/me/switch-role', protect, requireActive, switchDashboardRole);
+/**
+ * @swagger
+ * /users/me/onboard-role:
+ *   post:
+ *     summary: Add and onboard a role on the authenticated account
+ *     tags: [Users]
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [role]
+ *             properties:
+ *               role:
+ *                 type: string
+ *                 enum: [Mother, Babysitter]
+ *               hourlyRate:
+ *                 type: number
+ *                 description: Required and greater than zero for Babysitter onboarding
+ *     responses:
+ *       200: { description: Role onboarding completed and updated token returned }
+ *       400: { description: Role or hourly rate is invalid }
+ */
 router.post('/me/onboard-role', protect, requireActive, onboardRole);
 /**
  * @swagger

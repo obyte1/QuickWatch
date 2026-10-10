@@ -28,6 +28,16 @@ router.post(
   upload.fields([{ name: 'proofOfAddress', maxCount: 1 }, { name: 'identityCard', maxCount: 1 }]),
   submitKyc
 );
+/**
+ * @swagger
+ * /kyc/me:
+ *   get:
+ *     summary: Get the authenticated user's KYC application
+ *     tags: [KYC]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200: { description: KYC application returned, or null if not submitted }
+ */
 router.get('/me', protect, requireActive, getMyKyc);
 /**
  * @swagger

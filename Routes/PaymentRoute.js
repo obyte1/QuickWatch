@@ -148,6 +148,23 @@ router.get('/payout-account', protect, requireActive, getPayoutAccount);
  *         description: Payout request sent to the organization
  */
 router.post('/bookings/:bookingId/request-payout', protect, requireActive, requestPayout);
+/**
+ * @swagger
+ * /payments/bookings/{bookingId}/process-payout:
+ *   post:
+ *     summary: Process a requested sitter payout (admin only)
+ *     tags: [Payments]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: bookingId
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Payout transfer created }
+ *       403: { description: Admin access required }
+ *       409: { description: Booking is not ready for payout }
+ */
 router.post('/bookings/:bookingId/process-payout', protect, requireActive, authorize('Admin'), processPayout);
 
 /**
