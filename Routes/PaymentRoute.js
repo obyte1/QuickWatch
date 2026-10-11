@@ -109,9 +109,43 @@ router.post('/bookings/:bookingId/confirm', protect, requireActive, confirmCompl
  *     tags: [Payments]
  *     security:
  *       - bearerAuth: []
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               country:
+ *                 type: string
+ *                 default: US
+ *                 description: Two-letter country code for the connected account
+ *               refreshUrl:
+ *                 type: string
+ *                 format: uri
+ *                 description: Return destination when onboarding must be resumed
+ *               returnUrl:
+ *                 type: string
+ *                 format: uri
+ *                 description: Return destination after onboarding
  *     responses:
  *       201:
  *         description: Stripe Connect onboarding link returned
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required: [message, accountId, url]
+ *               properties:
+ *                 message: { type: string }
+ *                 accountId: { type: string }
+ *                 url: { type: string, format: uri }
+ *       400:
+ *         description: Invalid request
+ *       403:
+ *         description: Only babysitters can set up payout details
+ *       503:
+ *         description: Stripe is not configured
  */
 router.post('/payout-account', protect, requireActive, createPayoutAccount);
 

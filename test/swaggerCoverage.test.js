@@ -45,3 +45,14 @@ test('Swagger documents every registered HTTP endpoint', () => {
 
   assert.deepEqual(undocumentedOperations, []);
 });
+
+test('payout account Swagger documents its optional payload and onboarding response', () => {
+  const operation = require('../swagger').paths['/payments/payout-account'].post;
+  const requestBody = operation.requestBody;
+  const schema = requestBody.content['application/json'].schema;
+  const responseSchema = operation.responses['201'].content['application/json'].schema;
+
+  assert.equal(requestBody.required, false);
+  assert.deepEqual(Object.keys(schema.properties).sort(), ['country', 'refreshUrl', 'returnUrl']);
+  assert.deepEqual(responseSchema.required, ['message', 'accountId', 'url']);
+});

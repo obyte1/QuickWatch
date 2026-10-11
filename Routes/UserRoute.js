@@ -365,22 +365,37 @@ router.post('/me/onboard-role', protect, requireActive, onboardRole);
  * @swagger
  * /users/me/profile:
  *   patch:
- *     summary: Update the authenticated profile and optional picture
+ *     summary: Update the authenticated user's or admin's own profile
  *     tags: [Users]
  *     security: [{ bearerAuth: [] }]
  *     requestBody:
+ *       required: true
+ *       description: Email is read-only and cannot be changed through profile updates.
  *       content:
  *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
- *               picture: { type: string, format: binary }
- *               hourlyRate: { type: number }
+ *               FirstName: { type: string }
+ *               LastName: { type: string }
+ *               Gender: { type: string }
+ *               Phone: { type: string }
+ *               zipCode: { type: string }
+ *               Address: { type: string }
  *               about: { type: string }
- *               city: { type: string }
  *               state: { type: string }
+ *               city: { type: string }
+ *               sendEmail: { type: boolean }
+ *               sendPhone: { type: boolean }
+ *               no: { type: boolean }
+ *               hourlyRate:
+ *                 type: number
+ *                 description: Must be greater than zero when updating a babysitter's rate
+ *               picture: { type: string, format: binary }
  *     responses:
- *       200: { description: Profile updated }
+ *       200: { description: Profile updated, including the uploaded picture URL when provided }
+ *       400: { description: Invalid hourly rate }
+ *       401: { description: Authentication required }
  */
 router.patch('/me/profile', protect, requireActive, upload.single('picture'), updateProfile);
 
